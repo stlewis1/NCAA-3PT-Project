@@ -1,0 +1,12 @@
+name: NCAA-3PT-Forecast
+title: NCAA-3PT-Forecast
+username: stephen1ewis
+account: stephen1ewis
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16365484
+bundleId: 11402386
+url: https://stephen1ewis.shinyapps.io/NCAA-3PT-Forecast/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
