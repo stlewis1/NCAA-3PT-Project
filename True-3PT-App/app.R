@@ -8,7 +8,7 @@
 #o
 
 library(shiny)
-library(hoopR)
+# library(hoopR) # Use to pull in new data
 library(tidyverse)
 library(gt)
 library(ggthemes)
@@ -159,21 +159,24 @@ server <- function(input, output, session) {
   team_ids_2026 <- read_rds("https://github.com/stlewis1/NCAA-3PT-Data/raw/main/team_ids_2026.rds")
   current_season <- 2026
   
-  data_26 <- load_mbb_player_box(seasons = current_season) %>%
-    select(season, game_date, athlete_id, athlete_display_name, team_id,
-           team_display_name, minutes, field_goals_made, field_goals_attempted,
-           three_point_field_goals_made, three_point_field_goals_attempted,
-           free_throws_made, free_throws_attempted, points, assists, turnovers,
-           starter, did_not_play, team_score, athlete_jersey, athlete_position_abbreviation) %>%
-    filter(did_not_play == FALSE, minutes > 0, season == current_season,
-           team_id %in% team_ids_2026$team_id) %>%
-    # Get data for each season
-    group_by(athlete_id) %>%
-    summarise(
-      season_total_3pt_made = sum(three_point_field_goals_made, na.rm = TRUE),
-      season_total_3pt_attempted = sum(three_point_field_goals_attempted, na.rm = TRUE),
-    ) %>%
-    mutate(across(where(is.numeric), ~replace_na(.x, 0)))
+  # Load new data from hoopr
+  # data_26 <- load_mbb_player_box(seasons = current_season) %>%
+  #   select(season, game_date, athlete_id, athlete_display_name, team_id,
+  #          team_display_name, minutes, field_goals_made, field_goals_attempted,
+  #          three_point_field_goals_made, three_point_field_goals_attempted,
+  #          free_throws_made, free_throws_attempted, points, assists, turnovers,
+  #          starter, did_not_play, team_score, athlete_jersey, athlete_position_abbreviation) %>%
+  #   filter(did_not_play == FALSE, minutes > 0, season == current_season,
+  #          team_id %in% team_ids_2026$team_id) %>%
+  #   # Get data for each season
+  #   group_by(athlete_id) %>%
+  #   summarise(
+  #     season_total_3pt_made = sum(three_point_field_goals_made, na.rm = TRUE),
+  #     season_total_3pt_attempted = sum(three_point_field_goals_attempted, na.rm = TRUE),
+  #   ) %>%
+  #   mutate(across(where(is.numeric), ~replace_na(.x, 0)))
+  
+  data_26 <- read_rds("https://github.com/stlewis1/NCAA-3PT-Data/raw/main/season_data_2026.rds")
   
   # Update Predictions
   all_table_data <- read_rds("https://github.com/stlewis1/NCAA-3PT-Data/raw/main/predictions_2026.rds") %>%
@@ -189,6 +192,8 @@ server <- function(input, output, session) {
       season_confidence = sqrt(season_total_3pt_attempted*0.081),
       season_confidence = ifelse(season_confidence > 4.5, 4.5, season_confidence),
       confidence_score = (prior_confidence) + (season_confidence),
+      fg3_pct = season_total_3pt_made / season_total_3pt_attempted,
+      fg3_pct = ifelse(is.nan(fg3_pct), 0, fg3_pct)
     ) %>%
     select(jersey_no, full_name, team_display_name, lag_career_3pt_attempts, lag_career_3pt_pct, 
            season_total_3pt_made, season_total_3pt_attempted, fg3_pct, predicted_stable_3pt_pct,
