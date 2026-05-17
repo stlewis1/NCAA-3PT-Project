@@ -1,6 +1,6 @@
 # File to scrape ESPN Net points
 
-
+# Other action_type: "3ptShooting", 
 mbb_season_net_pts <- function(conf_games = 0, season = 2026, game_code_min = "20251001", game_code_max = "20260517", action_type = "total") {
   library(httr2)
   library(jsonlite)
@@ -44,4 +44,7 @@ mbb_season_net_pts <- function(conf_games = 0, season = 2026, game_code_min = "2
 
 
 # mbb_net <- mbb_season_net_pts()
+# saveRDS(mbb_net, "True 3pt Project/MBB Net Points 2026.RDS")
 
+# mbb_net <- mbb_season_net_pts(action_type = "3ptShooting")
+# saveRDS(mbb_net, "True 3pt Project/MBB 3pt Net Points 2026.RDS")
